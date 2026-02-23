@@ -27,9 +27,3 @@ jobs:
       run: |
         pytest tests/ -v --tb=short
       continue-on-error: true
-    
-    - name: Test Summary
-      if: always()
-      run: |
-        Write-Host "Tests completed!"
-        Write-Host "All tests have been executed."
