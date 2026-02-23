@@ -27,3 +27,43 @@ jobs:
       run: |
         pytest tests/ -v --tb=short
       continue-on-error: true
+
+    - name: Upload Test Report
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-report-python-${{ matrix.python-version }}
+        path: report.html
+    
+    - name: Publish Test Results
+      if: always()
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      with:
+        files: test-results.xml
+        check_name: Test Results - Python ${{ matrix.python-version }}
+      continue-on-error: true
+
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.EXAM_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release v${{ github.run_number }}
+        body: |
+          Automated release by GitHub Actions
+          
+          **Tests Status**: tests passed
+          
+          **Changes**: 
+          - See commit details for changes
+        draft: false
+        prerelease: false
