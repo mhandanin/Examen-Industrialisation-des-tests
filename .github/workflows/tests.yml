@@ -43,17 +43,6 @@ jobs:
         check_name: Test Results - Python ${{ matrix.python-version }}
       continue-on-error: true
 
-    - name: Notify Discord (Tests)
-      if: always()
-      uses: sarisia/actions-status-discord@v1
-      with:
-        webhook: ${{ secrets.DISCORD_WEBHOOK }}
-        status: ${{ job.status }}
-        title: "Tests"
-        description: |
-          Repository: ${{ github.repository }}
-          Branch: ${{ github.ref_name }}
-          Python: ${{ matrix.python-version }}
       
   release:
     needs: test
