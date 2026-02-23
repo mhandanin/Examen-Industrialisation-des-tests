@@ -26,7 +26,7 @@ jobs:
     - name: Run Tests
       run: |
         pytest tests/ -v --tb=short
-      continue-on-error: true
+      
 
     - name: Upload Test Report
       if: always()
@@ -43,6 +43,18 @@ jobs:
         check_name: Test Results - Python ${{ matrix.python-version }}
       continue-on-error: true
 
+    - name: Notify Discord (Tests)
+      if: always()
+      uses: sarisia/actions-status-discord@v1
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        status: ${{ job.status }}
+        title: "Tests"
+        description: |
+          Repository: ${{ github.repository }}
+          Branch: ${{ github.ref_name }}
+          Python: ${{ matrix.python-version }}
+      
   release:
     needs: test
     runs-on: ubuntu-latest
@@ -68,3 +80,15 @@ jobs:
         draft: false
         prerelease: false
         token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Notify Discord (Release)
+      if: success()
+      uses: sarisia/actions-status-discord@v1
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK }}
+        status: success
+        title: "New Release Created"
+        description: |
+          Repository: ${{ github.repository }}
+          Tag: v${{ github.run_number }}
+          Commit: ${{ github.sha }}
