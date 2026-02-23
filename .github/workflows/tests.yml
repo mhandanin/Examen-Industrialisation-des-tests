@@ -67,4 +67,4 @@ jobs:
           - See commit details for changes
         draft: false
         prerelease: false
-        token: ${{ secrets.EXAM_TOKEN }}
+        token: ${{ secrets.GITHUB_TOKEN }}
